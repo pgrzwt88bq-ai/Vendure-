@@ -4,7 +4,7 @@ import {
     DefaultSearchPlugin,
     VendureConfig,
 } from '@vendure/core';
-import { defaultEmailHandlers, EmailPlugin, FileBasedTemplateLoader } from '@vendure/email-plugin';
+import { EmailPlugin } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
@@ -12,7 +12,7 @@ import path from 'path';
 
 export const config: VendureConfig = {
     apiOptions: {
-        port: 3000,
+        port: process.env.PORT || 3000,
         adminApiPath: 'admin-api',
         shopApiPath: 'shop-api',
     },
@@ -42,11 +42,14 @@ export const config: VendureConfig = {
         DefaultJobQueuePlugin.init(),
         DefaultSearchPlugin.init(),
         EmailPlugin.init({
-            devMode: true,
-            outputPath: path.join(__dirname, '../static/email/test-emails'),
-            route: 'mailbox',
-            handlers: defaultEmailHandlers,
-            templateLoader: new FileBasedTemplateLoader(path.join(__dirname, '../static/email/templates')),
+            handlers: [],
+            templatePath: path.join(__dirname, '../static/email/templates'),
+            globalTemplateVars: {
+                fromAddress: '"example" <noreply@example.com>',
+                verifyEmailAddressUrl: 'http://localhost:8080/verify',
+                passwordResetUrl: 'http://localhost:8080/password-reset',
+                changeEmailAddressUrl: 'http://localhost:8080/verify-email-address-change'
+            },
         }),
         AdminUiPlugin.init({
             route: 'admin',
