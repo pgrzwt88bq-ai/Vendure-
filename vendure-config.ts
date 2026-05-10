@@ -8,8 +8,8 @@ export const config: VendureConfig = {
   },
   authOptions: {
     superadminCredentials: {
-      identifier: process.env.SUPERADMIN_USERNAME,
-      password: process.env.SUPERADMIN_PASSWORD,
+      identifier: process.env.SUPERADMIN_USERNAME || 'superadmin',
+      password: process.env.SUPERADMIN_PASSWORD || 'superadmin',
     },
   },
   dbConnectionOptions: {
