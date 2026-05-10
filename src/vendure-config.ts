@@ -32,8 +32,8 @@ export const config: VendureConfig = {
         paymentMethodHandlers: [dummyPaymentHandler],
     },
     plugins: [
-        DefaultJobQueuePlugin.init(),
-        DefaultSearchPlugin.init(),
-        AdminUiPlugin.init({ route: 'admin' }),
+        DefaultJobQueuePlugin.init({}),
+        DefaultSearchPlugin.init({}),
+        AdminUiPlugin.init({}),
     ],
 };
