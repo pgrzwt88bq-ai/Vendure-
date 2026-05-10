@@ -7,9 +7,11 @@ import {
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 
+const PORT = Number(process.env.PORT) || 3000;
+
 export const config: VendureConfig = {
     apiOptions: {
-        port: Number(process.env.PORT) || 3000,
+        port: PORT,
         adminApiPath: 'admin-api',
         shopApiPath: 'shop-api',
     },
@@ -34,6 +36,9 @@ export const config: VendureConfig = {
     plugins: [
         DefaultJobQueuePlugin.init({}),
         DefaultSearchPlugin.init({}),
-        AdminUiPlugin.init({}),
+        AdminUiPlugin.init({
+            route: 'admin',
+            port: PORT,
+        }),
     ],
 };
