@@ -17,4 +17,7 @@ export const config: VendureConfig = {
     url: process.env.DATABASE_URL,
     synchronize: true,
   },
+  paymentOptions: {
+    paymentMethodHandlers: [],
+  },
 };
