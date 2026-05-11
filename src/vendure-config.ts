@@ -22,7 +22,12 @@ export const config: VendureConfig = {
         synchronize: true,
         logging: false,
         url: process.env.DATABASE_URL,
-        ssl: { rejectUnauthorized: false },
+        ssl: {
+            rejectUnauthorized: false,
+        },
+    },
+    paymentOptions: {
+        paymentMethodHandlers: [],
     },
     plugins: [
         AssetServerPlugin.init({
@@ -32,6 +37,7 @@ export const config: VendureConfig = {
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
         
         EmailPlugin.init({
+            handlers: [],
             transport: { type: 'none' },
         }),
         
