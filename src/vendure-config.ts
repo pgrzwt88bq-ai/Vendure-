@@ -9,9 +9,7 @@ import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
 import path from 'path';
 
-// Render donne le port via process.env.PORT
 const PORT = Number(process.env.PORT) || 3000;
-// Render donne l'URL publique du service
 const PUBLIC_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
 
 export const config: VendureConfig = {
@@ -19,7 +17,6 @@ export const config: VendureConfig = {
         port: PORT,
         adminApiPath: 'admin-api',
         shopApiPath: 'shop-api',
-        // Important pour Render : autorise les CORS
         cors: true,
     },
     authOptions: {
@@ -31,9 +28,8 @@ export const config: VendureConfig = {
     },
     dbConnectionOptions: {
         type: 'postgres',
-        // Render Internal URL = PAS DE SSL
         ssl: false,
-        synchronize: true, // Créé les tables au premier boot
+        synchronize: true,
         logging: false,
         url: process.env.DATABASE_URL,
     },
@@ -44,8 +40,7 @@ export const config: VendureConfig = {
     plugins: [
         AssetServerPlugin.init({
             route: 'assets',
-            assetUploadDir: '/tmp/vendure/assets', // /tmp existe toujours sur Render
-            port: PORT,
+            assetUploadDir: '/tmp/vendure/assets',
         }),
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
         DefaultSearchPlugin.init({ indexStockStatus: false }),
