@@ -38,9 +38,6 @@ export const config: VendureConfig = {
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
         
         EmailPlugin.init({
-            route: 'mailbox',
-            handlers: [],
-            templatePath: path.join(__dirname, '../static/email/templates'),
             transport: { type: 'none' },
         }),
         
