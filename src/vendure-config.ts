@@ -1,4 +1,3 @@
-import { EmailPlugin } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
 import { DefaultJobQueuePlugin, VendureConfig } from '@vendure/core';
@@ -35,12 +34,6 @@ export const config: VendureConfig = {
             assetUploadDir: path.join(__dirname, '../static/assets'),
         }),
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
-        
-        EmailPlugin.init({
-            handlers: [],
-            transport: { type: 'none' },
-        }),
-        
         AdminUiPlugin.init({
             route: 'admin',
             port: Number(process.env.PORT) || 3000,
