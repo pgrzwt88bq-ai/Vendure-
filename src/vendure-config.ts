@@ -22,14 +22,8 @@ export const config: VendureConfig = {
         synchronize: true,
         logging: false,
         url: process.env.DATABASE_URL,
-        ssl: {
-            rejectUnauthorized: false,
-        },
+        ssl: { rejectUnauthorized: false },
     },
-    paymentOptions: {
-        paymentMethodHandlers: [],
-    },
-    customFields: {},
     plugins: [
         AssetServerPlugin.init({
             route: 'assets',
