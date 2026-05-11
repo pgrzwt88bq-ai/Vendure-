@@ -1,26 +1,21 @@
 import {
-    dummyPaymentHandler,
-    DefaultJobQueuePlugin,
-    DefaultSearchPlugin,
-    VendureConfig,
-} from '@vendure/core';
-import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
+    dummyEmailHandler,
+    EmailPlugin,
+} from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
+import { DefaultJobQueuePlugin } from '@vendure/job-queue-plugin';
+import { VendureConfig } from '@vendure/core';
 import path from 'path';
-
-const PORT = Number(process.env.PORT) || 3000;
-const PUBLIC_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
 
 export const config: VendureConfig = {
     apiOptions: {
-        port: PORT,
+        port: Number(process.env.PORT) || 3000,
         adminApiPath: 'admin-api',
         shopApiPath: 'shop-api',
-        cors: true,
     },
     authOptions: {
-        tokenMethod: 'bearer',
+        tokenMethod: ['bearer', 'cookie'],
         superadminCredentials: {
             identifier: 'superadmin',
             password: 'superadmin',
@@ -28,38 +23,41 @@ export const config: VendureConfig = {
     },
     dbConnectionOptions: {
         type: 'postgres',
-        ssl: { rejectUnauthorized: false }, // LE FIX
-        synchronize: true,
+        synchronize: true, // Mets false en prod plus tard
         logging: false,
         url: process.env.DATABASE_URL,
+        ssl: {
+            rejectUnauthorized: false, // OBLIGATOIRE pour Render
+        },
     },
     paymentOptions: {
-        paymentMethodHandlers: [dummyPaymentHandler],
+        paymentMethodHandlers: [],
     },
     customFields: {},
     plugins: [
         AssetServerPlugin.init({
             route: 'assets',
-            assetUploadDir: '/tmp/vendure/assets',
+            assetUploadDir: path.join(__dirname, '../static/assets'),
+            port: Number(process.env.PORT) || 3000,
         }),
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
-        DefaultSearchPlugin.init({ indexStockStatus: false }),
+        
+        // EMAIL PLUGIN DÉSACTIVÉ POUR FIX ENOENT
         EmailPlugin.init({
-            devMode: true,
-            outputPath: '/tmp/vendure/email-output',
-            route: 'mailbox',
-            handlers: defaultEmailHandlers,
+            handlers: [dummyEmailHandler],
             templatePath: path.join(__dirname, '../static/email/templates'),
+            transport: { type: 'none' },
             globalTemplateVars: {
-                fromAddress: '"Vendure" <noreply@vendure.io>',
-                verifyEmailAddressUrl: `${PUBLIC_URL}/verify`,
-                passwordResetUrl: `${PUBLIC_URL}/password-reset`,
-                changeEmailAddressUrl: `${PUBLIC_URL}/verify-email-address-change`,
+                fromAddress: '"KING SHOP" <noreply@king.com>',
+                verifyEmailAddressUrl: 'http://localhost:3000/verify',
+                passwordResetUrl: 'http://localhost:3000/reset',
+                changeEmailAddressUrl: 'http://localhost:3000/change-email',
             },
         }),
+        
         AdminUiPlugin.init({
             route: 'admin',
-            port: PORT,
+            port: Number(process.env.PORT) || 3000,
         }),
     ],
 };
