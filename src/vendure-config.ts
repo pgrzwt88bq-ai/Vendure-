@@ -16,17 +16,13 @@ const IS_DEV = process.env.APP_ENV === 'dev';
 const serverPort = +process.env.PORT || 3000;
 
 export const config: VendureConfig = {
-    // 1. LANGUE PAR DÉFAUT = FRANÇAIS
     defaultLanguageCode: LanguageCode.fr,
     
     apiOptions: {
         port: serverPort,
         adminApiPath: 'admin-api',
         shopApiPath: 'shop-api',
-        cors: {
-            origin: true,
-            credentials: true,
-        },
+        cors: { origin: true, credentials: true },
     },
     authOptions: {
         tokenMethod: ['bearer', 'cookie'],
@@ -34,9 +30,7 @@ export const config: VendureConfig = {
             identifier: process.env.SUPERADMIN_USERNAME,
             password: process.env.SUPERADMIN_PASSWORD,
         },
-        cookieOptions: {
-          secret: process.env.COOKIE_SECRET,
-        },
+        cookieOptions: { secret: process.env.COOKIE_SECRET },
     },
     dbConnectionOptions: {
         type: 'postgres',
@@ -72,12 +66,11 @@ export const config: VendureConfig = {
         AdminUiPlugin.init({
             route: 'admin',
             port: serverPort,
-            // 2. FORCE L'ADMIN EN FRANÇAIS
-            defaultLanguage: LanguageCode.fr,
-            availableLanguages: [LanguageCode.fr, LanguageCode.en],
+            adminUiConfig: {
+                defaultLanguage: LanguageCode.fr,
+                availableLanguages: [LanguageCode.fr, LanguageCode.en],
+            },
         }),
-        DefaultSellerPlugin.init({
-            commission: 15,
-        }),
+        DefaultSellerPlugin.init({ commission: 15 }),
     ],
 };
