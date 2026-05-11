@@ -16,6 +16,7 @@ const IS_DEV = process.env.APP_ENV === 'dev';
 const serverPort = +process.env.PORT || 3000;
 
 export const config: VendureConfig = {
+    // Langue par défaut du backend = Français
     defaultLanguageCode: LanguageCode.fr,
     
     apiOptions: {
@@ -63,12 +64,12 @@ export const config: VendureConfig = {
                 changeEmailAddressUrl: 'http://localhost:3001/verify-email-address-change'
             },
         }),
+        // FIX OFFICIEL RENDER : Force l'UI à utiliser le même domaine
         AdminUiPlugin.init({
             route: 'admin',
-            port: serverPort,
-            adminUiConfig: {
-                defaultLanguage: LanguageCode.fr,
-                availableLanguages: [LanguageCode.fr, LanguageCode.en],
+            app: {
+                apiHost: 'auto',
+                apiPort: 'auto',
             },
         }),
         DefaultSellerPlugin.init({ commission: 15 }),
