@@ -4,6 +4,7 @@ import {
     DefaultSearchPlugin,
     VendureConfig,
     DefaultSellerPlugin,
+    LanguageCode,
 } from '@vendure/core';
 import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
@@ -15,6 +16,8 @@ const IS_DEV = process.env.APP_ENV === 'dev';
 const serverPort = +process.env.PORT || 3000;
 
 export const config: VendureConfig = {
+    // LANGUE PAR DÉFAUT DE TOUTE L'APP = FRANÇAIS
+    defaultLanguageCode: LanguageCode.fr,
     apiOptions: {
         port: serverPort,
         adminApiPath: 'admin-api',
@@ -68,6 +71,10 @@ export const config: VendureConfig = {
         AdminUiPlugin.init({
             route: 'admin',
             port: serverPort,
+            // FORCE L'ADMIN EN FRANÇAIS
+            app: {
+                language: LanguageCode.fr,
+            },
         }),
         DefaultSellerPlugin.init({
             commission: 15,
