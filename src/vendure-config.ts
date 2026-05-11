@@ -16,8 +16,9 @@ const IS_DEV = process.env.APP_ENV === 'dev';
 const serverPort = +process.env.PORT || 3000;
 
 export const config: VendureConfig = {
-    // LANGUE PAR DÉFAUT DE TOUTE L'APP = FRANÇAIS
+    // 1. LANGUE PAR DÉFAUT = FRANÇAIS
     defaultLanguageCode: LanguageCode.fr,
+    
     apiOptions: {
         port: serverPort,
         adminApiPath: 'admin-api',
@@ -71,10 +72,9 @@ export const config: VendureConfig = {
         AdminUiPlugin.init({
             route: 'admin',
             port: serverPort,
-            // FORCE L'ADMIN EN FRANÇAIS
-            app: {
-                language: LanguageCode.fr,
-            },
+            // 2. FORCE L'ADMIN EN FRANÇAIS
+            defaultLanguage: LanguageCode.fr,
+            availableLanguages: [LanguageCode.fr, LanguageCode.en],
         }),
         DefaultSellerPlugin.init({
             commission: 15,
