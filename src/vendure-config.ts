@@ -28,7 +28,7 @@ export const config: VendureConfig = {
     },
     dbConnectionOptions: {
         type: 'postgres',
-        ssl: false,
+        ssl: { rejectUnauthorized: false }, // LE FIX
         synchronize: true,
         logging: false,
         url: process.env.DATABASE_URL,
