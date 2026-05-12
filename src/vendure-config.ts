@@ -10,16 +10,17 @@ import {
     RequestContext,
     LanguageCode,
     CurrencyCode,
-    VendurePlugin,
+    Injector,
+    type VendurePlugin, // <- FIX 1: import du type
 } from '@vendure/core';
 import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
 import path from 'path';
 
-// Plugin sans décorateur - format objet
+// Plugin en objet avec types corrects
 const AutoRepairPlugin: VendurePlugin = {
-    async onApplicationBootstrap(injector) {
+    async onApplicationBootstrap(injector: Injector) { // <- FIX 2: type Injector
         const ctx = RequestContext.empty();
         const channelService = injector.get(ChannelService);
         const taxCategoryService = injector.get(TaxCategoryService);
