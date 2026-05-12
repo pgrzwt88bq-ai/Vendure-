@@ -13,7 +13,6 @@ import {
     VendurePlugin,
     PluginCommonModule,
 } from '@vendure/core';
-import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
 import path from 'path';
@@ -100,14 +99,15 @@ export const config: VendureConfig = {
             route: 'assets',
             assetUploadDir: path.join(__dirname, '../static/assets'),
         }),
-        EmailPlugin.init({
-            handlers: defaultEmailHandlers,
-            templatePath: path.join(__dirname, '../static/email/templates'),
-            transport: {
-                type: 'testing',
-                onSend: () => {},
-            },
-        }),
+        // EmailPlugin désactivé pour éviter l'erreur ENOENT
+        // EmailPlugin.init({
+        // handlers: defaultEmailHandlers,
+        // templatePath: path.join(__dirname, '../static/email/templates'),
+        // transport: {
+        // type: 'testing',
+        // onSend: () => {},
+        // },
+        // }),
         AdminUiPlugin.init({
             route: 'admin',
             port: Number(process.env.PORT) || 3000,
