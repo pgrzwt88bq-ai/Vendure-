@@ -8,54 +8,44 @@ import {
     TaxCategoryService,
     ZoneService,
     RequestContext,
-    VendurePlugin,
-    PluginCommonModule,
     LanguageCode,
     CurrencyCode,
+    VendurePlugin,
 } from '@vendure/core';
 import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
 import path from 'path';
 
-@VendurePlugin({
-    imports: [PluginCommonModule],
-})
-export class AutoRepairPlugin {
-    constructor(
-        private channelService: ChannelService,
-        private taxCategoryService: TaxCategoryService,
-        private zoneService: ZoneService,
-    ) {}
-
-    // Pas d'interface OnApplicationBootstrap - juste la méthode
-    async onApplicationBootstrap() {
+// Plugin sans décorateur - format objet
+const AutoRepairPlugin: VendurePlugin = {
+    async onApplicationBootstrap(injector) {
         const ctx = RequestContext.empty();
+        const channelService = injector.get(ChannelService);
+        const taxCategoryService = injector.get(TaxCategoryService);
+        const zoneService = injector.get(ZoneService);
 
         // 1. Zone par défaut D'ABORD
         let defaultZone;
-        const zones = await this.zoneService.findAll(ctx);
+        const zones = await zoneService.findAll(ctx);
         if (zones.items.length === 0) {
-            defaultZone = await this.zoneService.create(ctx, { name: 'World' });
+            defaultZone = await zoneService.create(ctx, { name: 'World' });
             Logger.info('Default zone recreated KING 👑', 'AutoRepairPlugin');
         } else {
             defaultZone = zones.items[0];
         }
 
         // 2. TaxCategory par défaut
-        let defaultTaxCategory;
-        const taxCategories = await this.taxCategoryService.findAll(ctx);
+        const taxCategories = await taxCategoryService.findAll(ctx);
         if (taxCategories.items.length === 0) {
-            defaultTaxCategory = await this.taxCategoryService.create(ctx, { name: 'Standard Tax' });
+            await taxCategoryService.create(ctx, { name: 'Standard Tax' });
             Logger.info('Default tax category recreated KING 👑', 'AutoRepairPlugin');
-        } else {
-            defaultTaxCategory = taxCategories.items[0];
         }
 
         // 3. CANAL BERTHO PAR DÉFAUT
-        const channels = await this.channelService.findAll(ctx);
+        const channels = await channelService.findAll(ctx);
         if (channels.items.length === 0) {
-            await this.channelService.create(ctx, {
+            await channelService.create(ctx, {
                 code: 'bertho',
                 token: 'bertho-token',
                 defaultLanguageCode: LanguageCode.fr,
@@ -67,7 +57,7 @@ export class AutoRepairPlugin {
             Logger.info('Canal Bertho recréé KING 👑', 'AutoRepairPlugin');
         }
     }
-}
+};
 
 export const config: VendureConfig = {
     apiOptions: {
@@ -108,7 +98,7 @@ export const config: VendureConfig = {
             templatePath: path.join(__dirname, '../static/email/templates'),
             transport: {
                 type: 'testing',
-                onSend: () => {}, // Fix erreur TS2322
+                onSend: () => {},
             },
         }),
         AdminUiPlugin.init({
