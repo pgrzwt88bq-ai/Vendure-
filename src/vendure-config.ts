@@ -5,11 +5,13 @@ import {
     VendureConfig,
     ChannelService,
     Logger,
+    TaxCategoryService,
+    ZoneService,
+    RequestContext,
 } from '@vendure/core';
 import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
-import { MultivendorPlugin } from '@vendure/multivendor-plugin';
 import path from 'path';
 
 export const config: VendureConfig = {
@@ -17,10 +19,7 @@ export const config: VendureConfig = {
         port: Number(process.env.PORT) || 3000,
         adminApiPath: 'admin-api',
         shopApiPath: 'shop-api',
-        cors: {
-            origin: true,
-            credentials: true,
-        },
+        cors: true,
     },
     authOptions: {
         tokenMethod: ['bearer', 'cookie'],
@@ -34,8 +33,7 @@ export const config: VendureConfig = {
     },
     dbConnectionOptions: {
         type: 'postgres',
-        synchronize: true, // À désactiver en prod
-        logging: false,
+        synchronize: true,
         url: process.env.DATABASE_URL,
         ssl: process.env.NODE_ENV === 'production'? { rejectUnauthorized: false } : false,
     },
@@ -43,10 +41,19 @@ export const config: VendureConfig = {
         paymentMethodHandlers: [dummyPaymentHandler],
     },
     plugins: [
-        // AUTO-CREATE DEFAULT CHANNEL SI IL EXISTE PAS
+        // PLUGIN AUTO-REPAIR: Recrée channel/taxe/zone si supprimés
         {
             init: async (injector) => {
                 const channelService = injector.get(ChannelService);
+                const taxCategoryService = injector.get(TaxCategoryService);
+                const zoneService = injector.get(ZoneService);
+                const ctx = new RequestContext({
+                    apiType: 'admin',
+                    isAuthorized: true,
+                    authorizedAsOwnerOnly: false,
+                    channel: { id: 1 } as any,
+                });
+
                 const channels = await channelService.findAll();
                 if (channels.items.length === 0) {
                     await channelService.create({
@@ -55,14 +62,22 @@ export const config: VendureConfig = {
                         defaultLanguageCode: 'fr',
                         currencyCode: 'XOF',
                     });
-                    Logger.info('Default channel auto-created KING 👑');
+                    Logger.info('Default channel recreated KING 👑');
+                }
+
+                const taxCategories = await taxCategoryService.findAll(ctx);
+                if (taxCategories.length === 0) {
+                    await taxCategoryService.create(ctx, { name: 'Standard Tax' });
+                    Logger.info('Default tax category recreated KING 👑');
+                }
+
+                const zones = await zoneService.findAll(ctx);
+                if (zones.length === 0) {
+                    await zoneService.create(ctx, { name: 'World' });
+                    Logger.info('Default zone recreated KING 👑');
                 }
             },
         },
-        MultivendorPlugin.init({
-            platformFeePercent: 10,
-            platformFeeSKU: 'PLATFORM_FEE',
-        }),
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
         DefaultSearchPlugin.init({ indexStockStatus: true }),
         AssetServerPlugin.init({
@@ -73,15 +88,6 @@ export const config: VendureConfig = {
         EmailPlugin.init({
             handlers: defaultEmailHandlers,
             templatePath: path.join(__dirname, '../static/email/templates'),
-            transport: {
-                type: 'smtp',
-                host: 'smtp.example.com',
-                port: 587,
-                auth: {
-                    user: 'username',
-                    pass: 'password',
-                },
-            },
             from: 'noreply@king.com',
         }),
         AdminUiPlugin.init({
