@@ -10,14 +10,18 @@ import {
     RequestContext,
     LanguageCode,
     CurrencyCode,
-    Injector,
+    VendurePlugin,
+    PluginCommonModule,
 } from '@vendure/core';
 import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
 import path from 'path';
 
-// CLASSE sans décorateur - Vendure 2.3.4 aime ça
+// PLUGIN CORRIGÉ - avec décorateur pour l'injection
+@VendurePlugin({
+    imports: [PluginCommonModule],
+})
 export class AutoRepairPlugin {
     constructor(
         private channelService: ChannelService,
