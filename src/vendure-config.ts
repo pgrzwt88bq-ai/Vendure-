@@ -11,16 +11,15 @@ import {
     LanguageCode,
     CurrencyCode,
     Injector,
-    type VendurePlugin, // <- FIX 1: import du type
 } from '@vendure/core';
 import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
 import path from 'path';
 
-// Plugin en objet avec types corrects
-const AutoRepairPlugin: VendurePlugin = {
-    async onApplicationBootstrap(injector: Injector) { // <- FIX 2: type Injector
+// Plugin SANS : VendurePlugin - TS infère tout seul
+const AutoRepairPlugin = {
+    async onApplicationBootstrap(injector: Injector) {
         const ctx = RequestContext.empty();
         const channelService = injector.get(ChannelService);
         const taxCategoryService = injector.get(TaxCategoryService);
