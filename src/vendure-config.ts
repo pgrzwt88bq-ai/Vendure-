@@ -17,35 +17,38 @@ import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
 import path from 'path';
 
-// Plugin SANS : VendurePlugin - TS infère tout seul
-const AutoRepairPlugin = {
-    async onApplicationBootstrap(injector: Injector) {
+// CLASSE sans décorateur - Vendure 2.3.4 aime ça
+export class AutoRepairPlugin {
+    constructor(
+        private channelService: ChannelService,
+        private taxCategoryService: TaxCategoryService,
+        private zoneService: ZoneService,
+    ) {}
+
+    async onApplicationBootstrap() {
         const ctx = RequestContext.empty();
-        const channelService = injector.get(ChannelService);
-        const taxCategoryService = injector.get(TaxCategoryService);
-        const zoneService = injector.get(ZoneService);
 
         // 1. Zone par défaut D'ABORD
         let defaultZone;
-        const zones = await zoneService.findAll(ctx);
+        const zones = await this.zoneService.findAll(ctx);
         if (zones.items.length === 0) {
-            defaultZone = await zoneService.create(ctx, { name: 'World' });
+            defaultZone = await this.zoneService.create(ctx, { name: 'World' });
             Logger.info('Default zone recreated KING 👑', 'AutoRepairPlugin');
         } else {
             defaultZone = zones.items[0];
         }
 
         // 2. TaxCategory par défaut
-        const taxCategories = await taxCategoryService.findAll(ctx);
+        const taxCategories = await this.taxCategoryService.findAll(ctx);
         if (taxCategories.items.length === 0) {
-            await taxCategoryService.create(ctx, { name: 'Standard Tax' });
+            await this.taxCategoryService.create(ctx, { name: 'Standard Tax' });
             Logger.info('Default tax category recreated KING 👑', 'AutoRepairPlugin');
         }
 
         // 3. CANAL BERTHO PAR DÉFAUT
-        const channels = await channelService.findAll(ctx);
+        const channels = await this.channelService.findAll(ctx);
         if (channels.items.length === 0) {
-            await channelService.create(ctx, {
+            await this.channelService.create(ctx, {
                 code: 'bertho',
                 token: 'bertho-token',
                 defaultLanguageCode: LanguageCode.fr,
@@ -57,7 +60,7 @@ const AutoRepairPlugin = {
             Logger.info('Canal Bertho recréé KING 👑', 'AutoRepairPlugin');
         }
     }
-};
+}
 
 export const config: VendureConfig = {
     apiOptions: {
