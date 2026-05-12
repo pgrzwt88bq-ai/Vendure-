@@ -3,10 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "ts-node./src/index.ts",
-    "start": "ts-node./src/index.ts",
-    "build": "tsc",
-    "start:prod": "node dist/index.js"
+ "dev": "ts-node src/index.ts",
+"build": "tsc",
+"start": "node dist/index.js"
   },
   "dependencies": {
     "@vendure/admin-ui-plugin": "2.3.4",
