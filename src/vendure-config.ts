@@ -12,7 +12,6 @@ import {
     PluginCommonModule,
     LanguageCode,
     CurrencyCode,
-    OnApplicationBootstrap,
 } from '@vendure/core';
 import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
@@ -22,13 +21,14 @@ import path from 'path';
 @VendurePlugin({
     imports: [PluginCommonModule],
 })
-export class AutoRepairPlugin implements OnApplicationBootstrap {
+export class AutoRepairPlugin {
     constructor(
         private channelService: ChannelService,
         private taxCategoryService: TaxCategoryService,
         private zoneService: ZoneService,
     ) {}
 
+    // Pas d'interface OnApplicationBootstrap - juste la méthode
     async onApplicationBootstrap() {
         const ctx = RequestContext.empty();
 
@@ -108,6 +108,7 @@ export const config: VendureConfig = {
             templatePath: path.join(__dirname, '../static/email/templates'),
             transport: {
                 type: 'testing',
+                onSend: () => {}, // Fix erreur TS2322
             },
         }),
         AdminUiPlugin.init({
