@@ -3,75 +3,90 @@ import {
     DefaultJobQueuePlugin,
     DefaultSearchPlugin,
     VendureConfig,
-    DefaultSellerPlugin,
-    LanguageCode,
+    ChannelService,
+    Logger,
 } from '@vendure/core';
 import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
-import 'dotenv/config';
+import { MultivendorPlugin } from '@vendure/multivendor-plugin';
 import path from 'path';
 
-const IS_DEV = process.env.APP_ENV === 'dev';
-const serverPort = +process.env.PORT || 3000;
-
 export const config: VendureConfig = {
-    // Langue par défaut du backend = Français
-    defaultLanguageCode: LanguageCode.fr,
-    
     apiOptions: {
-        port: serverPort,
+        port: Number(process.env.PORT) || 3000,
         adminApiPath: 'admin-api',
         shopApiPath: 'shop-api',
-        cors: { origin: true, credentials: true },
+        cors: {
+            origin: true,
+            credentials: true,
+        },
     },
     authOptions: {
         tokenMethod: ['bearer', 'cookie'],
         superadminCredentials: {
-            identifier: process.env.SUPERADMIN_USERNAME,
-            password: process.env.SUPERADMIN_PASSWORD,
+            identifier: process.env.SUPERADMIN_USERNAME || 'superadmin',
+            password: process.env.SUPERADMIN_PASSWORD || 'superadmin',
         },
-        cookieOptions: { secret: process.env.COOKIE_SECRET },
+        cookieOptions: {
+            secret: process.env.COOKIE_SECRET || 'cookie-secret',
+        },
     },
     dbConnectionOptions: {
         type: 'postgres',
-        url: process.env.DATABASE_URL,
-        synchronize: false,
-        migrations: [path.join(__dirname, './migrations/*.+(js|ts)')],
+        synchronize: true, // À désactiver en prod
         logging: false,
-        ssl:!IS_DEV? { rejectUnauthorized: false } : false,
+        url: process.env.DATABASE_URL,
+        ssl: process.env.NODE_ENV === 'production'? { rejectUnauthorized: false } : false,
     },
     paymentOptions: {
         paymentMethodHandlers: [dummyPaymentHandler],
     },
     plugins: [
-        AssetServerPlugin.init({
-            route: 'assets',
-            assetUploadDir: path.join(__dirname, '../static/assets'),
+        // AUTO-CREATE DEFAULT CHANNEL SI IL EXISTE PAS
+        {
+            init: async (injector) => {
+                const channelService = injector.get(ChannelService);
+                const channels = await channelService.findAll();
+                if (channels.items.length === 0) {
+                    await channelService.create({
+                        code: '__default_channel__',
+                        token: 'default-token',
+                        defaultLanguageCode: 'fr',
+                        currencyCode: 'XOF',
+                    });
+                    Logger.info('Default channel auto-created KING 👑');
+                }
+            },
+        },
+        MultivendorPlugin.init({
+            platformFeePercent: 10,
+            platformFeeSKU: 'PLATFORM_FEE',
         }),
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
         DefaultSearchPlugin.init({ indexStockStatus: true }),
+        AssetServerPlugin.init({
+            route: 'assets',
+            assetUploadDir: path.join(__dirname, '../static/assets'),
+            port: Number(process.env.PORT) || 3000,
+        }),
         EmailPlugin.init({
-            devMode: true,
-            outputPath: path.join(__dirname, '../static/email/test-emails'),
-            route: 'mailbox',
             handlers: defaultEmailHandlers,
             templatePath: path.join(__dirname, '../static/email/templates'),
-            globalTemplateVars: {
-                fromAddress: '"King Bertho" <noreply@vendure-king.com>',
-                verifyEmailAddressUrl: 'http://localhost:3001/verify',
-                passwordResetUrl: 'http://localhost:3001/password-reset',
-                changeEmailAddressUrl: 'http://localhost:3001/verify-email-address-change'
+            transport: {
+                type: 'smtp',
+                host: 'smtp.example.com',
+                port: 587,
+                auth: {
+                    user: 'username',
+                    pass: 'password',
+                },
             },
+            from: 'noreply@king.com',
         }),
-        // FIX OFFICIEL RENDER : Force l'UI à utiliser le même domaine
         AdminUiPlugin.init({
             route: 'admin',
-            app: {
-                apiHost: 'auto',
-                apiPort: 'auto',
-            },
+            port: Number(process.env.PORT) || 3000,
         }),
-        DefaultSellerPlugin.init({ commission: 15 }),
     ],
 };
