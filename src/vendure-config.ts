@@ -67,7 +67,7 @@ export const config: VendureConfig = {
     adminApiPath: 'bertho-admin-242x2005',
     shopApiPath: 'shop-api',
     cors: {
-      origin: ['https://bertho-marketplace.vercel.app', 'http://localhost:3000'],
+      origin: true,
       credentials: true,
     },
   },
