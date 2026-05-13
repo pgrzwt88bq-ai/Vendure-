@@ -63,7 +63,8 @@ export class AutoRepairPlugin {
 
 export const config: VendureConfig = {
   apiOptions: {
-    port: parseInt(process.env.PORT) || 3000,
+    port: parseInt(process.env.PORT) || 10000,
+    hostname: '0.0.0.0',
     adminApiPath: 'bertho-admin-api',
     shopApiPath: 'shop-api',
     cors: {
@@ -104,7 +105,8 @@ export const config: VendureConfig = {
     }),
     AdminUiPlugin.init({
       route: 'bertho-admin-242x2005',
-      port: Number(process.env.PORT) || 3000,
+      port: parseInt(process.env.PORT) || 10000,
+      hostname: '0.0.0.0',
     }),
   ],
 
