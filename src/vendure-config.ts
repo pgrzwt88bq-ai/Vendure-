@@ -18,7 +18,6 @@ import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
 import { DefaultLocalizationPlugin } from '@vendure/core';
 import path from 'path';
 
-// Ton AutoRepairPlugin reste ici
 @VendurePlugin({
   imports: [PluginCommonModule],
 })
@@ -66,7 +65,7 @@ export class AutoRepairPlugin {
 export const config: VendureConfig = {
   apiOptions: {
     port: parseInt(process.env.PORT) || 3000,
-    adminApiPath: 'admin-api',
+    adminApiPath: 'bertho-admin-242x2005',
     shopApiPath: 'shop-api',
     cors: {
       origin: ['https://bertho-marketplace.vercel.app', 'http://localhost:3000'],
@@ -105,11 +104,10 @@ export const config: VendureConfig = {
       assetUploadDir: path.join(__dirname, '../static/assets'),
     }),
     AdminUiPlugin.init({
-      route: 'admin',
+      route: 'bertho-admin-242x2005',
       port: Number(process.env.PORT) || 3000,
     }),
 
-    // 🌍 Plugin multi-langue ajouté ici
     DefaultLocalizationPlugin.init({
       availableLanguages: ['fr', 'en', 'ar', 'es', 'pt', 'de', 'it', 'nl'],
       defaultLanguage: 'fr',
