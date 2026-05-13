@@ -15,7 +15,6 @@ import {
 } from '@vendure/core';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
-import { DefaultLocalizationPlugin } from '@vendure/core';
 import path from 'path';
 
 @VendurePlugin({
@@ -106,11 +105,6 @@ export const config: VendureConfig = {
     AdminUiPlugin.init({
       route: 'bertho-admin-242x2005',
       port: Number(process.env.PORT) || 3000,
-    }),
-
-    DefaultLocalizationPlugin.init({
-      availableLanguages: ['fr', 'en', 'ar', 'es', 'pt', 'de', 'it', 'nl'],
-      defaultLanguage: 'fr',
     }),
   ],
 
