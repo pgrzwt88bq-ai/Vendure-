@@ -67,6 +67,8 @@ export const config: VendureConfig = {
     hostname: '0.0.0.0',
     adminApiPath: 'bertho-admin-api',
     shopApiPath: 'shop-api',
+    adminApiPlayground: true,
+    adminApiDebug: true,
     cors: {
       origin: true,
       credentials: true,
